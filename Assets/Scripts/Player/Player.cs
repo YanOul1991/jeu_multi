@@ -1,58 +1,69 @@
 using UnityEngine;
-using System.Collections;
 using TMPro;
-using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
-    private UserInputs inputs;
-    [field: SerializeField] TextMeshProUGUI txt;
-    [field: SerializeField] Camera cam;
-    [field: SerializeField] LayerMask mouseMask;
+  private UserInputs inputs;
+  [field: SerializeField] private TextMeshProUGUI txt;
+  [field: SerializeField] private Camera cam;
+  [field: SerializeField] private Transform m_limit_x;
+  [field: SerializeField] private Transform m_limit_z;
+  [field: SerializeField] private Transform m_limit_center;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    private void Awake()
+  // Start is called once before the first execution of Update after the MonoBehaviour is created
+  private void Awake()
+  {
+    inputs = new UserInputs();
+    Application.targetFrameRate = -1;
+  }
+  
+  private void Start()
+  {
+    Debug.Log("Game Start");
+    Cursor.lockState = CursorLockMode.Confined;
+    Cursor.visible = false;
+  }
+
+  private void OnEnable()
+  {
+    inputs.Enable();
+  }
+
+  private void OnDisable()
+  {
+    inputs.Disable();
+  }
+
+  // Update is called once per frame
+  void Update()
+  {
+    Vector2 mouseDelta = inputs.MapMain.Look.ReadValue<Vector2>();
+    mouseDelta *= 0.02f;
+    transform.position += new Vector3(mouseDelta.x, 0, mouseDelta.y);
+    if (mouseDelta.magnitude != 0)
     {
-        inputs = new UserInputs();
-        Application.targetFrameRate = -1;
+      txt.text = "Player position: " + mouseDelta;
+      Debug.Log(mouseDelta.normalized);
     }
 
-    private void Start()
+    if (transform.position.x > m_limit_x.transform.position.x)
     {
-        Debug.Log("Game Start");
+      transform.position = new(m_limit_x.transform.position.x, 0, transform.position.z);
     }
 
-    private void OnEnable()
+    if (transform.position.x < -m_limit_x.transform.position.x)
     {
-        inputs.Enable();
+      transform.position = new(-m_limit_x.transform.position.x, 0, transform.position.z);
     }
 
-    private void OnDisable()
+    if (transform.position.z < m_limit_z.transform.position.z)
     {
-        inputs.Disable();
+      transform.position = new(transform.position.x, 0, m_limit_z.transform.position.z);
     }
-    // Update is called once per frame
-    void Update()
+    
+    if (transform.position.z > m_limit_center.transform.position.z)
     {
-        // Vector2 mousePosition = inputs.MapMain.Look.ReadValue<Vector2>();
-        // transform.position = new Vector3(mousePosition.x, 0.5f, mousePosition.y);
-        // txt.text = "Mouse position: " + inputs.MapMain.Look.ReadValue<Vector2>();
+      transform.position = new(transform.position.x, 0, m_limit_center.transform.position.z);
     }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-    }
-
-    private void FixedUpdate()
-    {
-        Vector2 mousePosition = inputs.MapMain.Look.ReadValue<Vector2>();
-        Vector3 mouseToWorld = Camera.main.ScreenToWorldPoint(new Vector3(
-            mousePosition.x,
-            mousePosition.y,
-            Camera.main.transform.position.y));
-
-        txt.text = "Hit position: " + mouseToWorld;
-
-        transform.position = mouseToWorld;
-    }
+  }
 }

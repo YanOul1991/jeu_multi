@@ -150,7 +150,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 116
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!64 &131546311
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -187,6 +187,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Force
   thrust: 100
   rb: {fileID: 0}
+--- !u!114 &131546316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 131546306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae0adc046b329c24c941659e11f84488, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PuckPhysics
 --- !u!1001 &307028668
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -202,6 +214,10 @@ PrefabInstance:
     - target: {fileID: 4113103967891547676, guid: d4385117be33b534fa2853515c43d0aa, type: 3}
       propertyPath: m_Name
       value: Player (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4113103967891547676, guid: d4385117be33b534fa2853515c43d0aa, type: 3}
+      propertyPath: m_TagString
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 9157017809012783279, guid: d4385117be33b534fa2853515c43d0aa, type: 3}
       propertyPath: m_LocalPosition.x
@@ -253,9 +269,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4113103967891547676, guid: d4385117be33b534fa2853515c43d0aa, type: 3}
       insertIndex: -1
       addedObject: {fileID: 801141631}
-    - targetCorrespondingSourceObject: {fileID: 4113103967891547676, guid: d4385117be33b534fa2853515c43d0aa, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 801141632}
   m_SourcePrefab: {fileID: 100100000, guid: d4385117be33b534fa2853515c43d0aa, type: 3}
 --- !u!1 &390170159
 GameObject:
@@ -536,7 +549,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &724749172
 Transform:
@@ -628,20 +641,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 116
-  m_CollisionDetection: 0
---- !u!114 &801141632
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 801141623}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 274d1256995cd4040869e0df1759f102, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MouseSpeedTracker
-  mouseSpeed: 0
+  m_CollisionDetection: 1
 --- !u!1 &824940604
 GameObject:
   m_ObjectHideFlags: 0
@@ -659,7 +659,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!64 &824940605
 MeshCollider:
@@ -769,7 +769,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &986015129
 Transform:
@@ -876,6 +876,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7206764056179490190, guid: 326618c2b9825204ca1c2396d7cd8b61, type: 3}
       insertIndex: -1
       addedObject: {fileID: 131546315}
+    - targetCorrespondingSourceObject: {fileID: 7206764056179490190, guid: 326618c2b9825204ca1c2396d7cd8b61, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 131546316}
   m_SourcePrefab: {fileID: 100100000, guid: 326618c2b9825204ca1c2396d7cd8b61, type: 3}
 --- !u!1 &1095062154
 GameObject:
@@ -892,7 +895,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1095062155
 Transform:
@@ -941,6 +944,10 @@ PrefabInstance:
     - target: {fileID: 4664644630300237247, guid: 927d448509f36024fb026bb57ae62761, type: 3}
       propertyPath: m_Name
       value: tableWgoals (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4664644630300237247, guid: 927d448509f36024fb026bb57ae62761, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 7416085324790660679, guid: 927d448509f36024fb026bb57ae62761, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -1144,7 +1151,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2030997532
 Transform:

@@ -4,8 +4,6 @@ using TMPro;
 public class Player : MonoBehaviour
 {
   private UserInputs inputs;
-  [field: SerializeField] private TextMeshProUGUI txt;
-  [field: SerializeField] private Camera cam;
   [field: SerializeField] private Transform m_limit_x;
   [field: SerializeField] private Transform m_limit_z;
   [field: SerializeField] private Transform m_limit_center;
@@ -38,14 +36,15 @@ public class Player : MonoBehaviour
   void Update()
   {
     Vector2 mouseDelta = inputs.MapMain.Look.ReadValue<Vector2>();
-    mouseDelta *= 0.02f;
-    transform.position += new Vector3(mouseDelta.x, 0, mouseDelta.y);
-    if (mouseDelta.magnitude != 0)
-    {
-      txt.text = "Player position: " + mouseDelta;
-      Debug.Log(mouseDelta.normalized);
-    }
+    mouseDelta *= 1000f;
+    // transform.position += new Vector3(mouseDelta.x, 0, mouseDelta.y);
+    GetComponent<Rigidbody>().AddForce(new(mouseDelta.x, 0, mouseDelta.y));
 
+    if (mouseDelta.magnitude < Mathf.Epsilon)
+    {
+      GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+    }
+    
     if (transform.position.x > m_limit_x.transform.position.x)
     {
       transform.position = new(m_limit_x.transform.position.x, 0, transform.position.z);
@@ -60,7 +59,7 @@ public class Player : MonoBehaviour
     {
       transform.position = new(transform.position.x, 0, m_limit_z.transform.position.z);
     }
-    
+
     if (transform.position.z > m_limit_center.transform.position.z)
     {
       transform.position = new(transform.position.x, 0, m_limit_center.transform.position.z);

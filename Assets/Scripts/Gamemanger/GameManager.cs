@@ -1,16 +1,12 @@
 using UnityEngine;
-using Unity.Netcode; // namespace pour utiliser Netcode
-using UnityEngine.SceneManagement; // namespace pour la gestion des scènes
-
-public class GameManager : NetworkBehaviour //pour un network object
+using Unity.Netcode; 
+using UnityEngine.SceneManagement; 
+public class GameManager : NetworkBehaviour
 {
-    public static GameManager instance;// Singleton pour parler au GameManager de n'importe où
+    public static GameManager instance;
+    public bool partieEnCours { private set; get; } 
+    public bool partieTerminee { private set; get; } 
 
-    public bool partieEnCours { private set; get; } //permet de savoir si une partie est en cours
-    public bool partieTerminee { private set; get; } // permet de savoir si une partie est terminée
-
-
-    // Création du singleton si nécessaire
     void Awake()
     {
         if (instance == null)
@@ -63,12 +59,12 @@ public class GameManager : NetworkBehaviour //pour un network object
         partieTerminee = true;
     }
 
-  // Fonction appelée par le bouton Recommencer pour recommencer une partie
+    // Fonction appelée par le bouton Recommencer pour recommencer une partie
     public void Recommencer()
     {
-        NetworkManager.Singleton.Shutdown(); // On arrête le NetworkManager pour réinitialiser la partie
+        NetworkManager.Singleton.Shutdown(); 
         Destroy(NetworkManager.gameObject);
-        partieEnCours = false; // On remet la partie en cours à false
-        SceneManager.LoadScene(0);// On recharge la scène de jeu
+        partieEnCours = false; 
+        SceneManager.LoadScene(0);
     }
 }

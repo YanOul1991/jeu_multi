@@ -17,6 +17,10 @@ public class SceneDataJeu : MonoBehaviour
     [field: SerializeField] private Button m_boutonStart_host;
     [field: SerializeField] private Button m_boutonStart_client;
 
+    [Header("Prefab Objects")]
+    [field: SerializeField] public GameObject PlayerPrefab { get; private set; }
+    [field: SerializeField] public GameObject PuckPrefab { get; private set; }
+
     private void Awake()
     {
         if (Singleton == null) Singleton = this;

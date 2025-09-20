@@ -54,9 +54,9 @@ public class PlayerServerAuthority : NetworkBehaviour
 
     if (IsServer)
     {
-
       m_boundCheck = CheckBoundsPlayer1;
       m_deltaCheck = CheckDeltaPlayer1;
+      NetworkManager.Singleton.OnClientConnectedCallback += OnNewClientConnected;
     }
     else
     {
@@ -67,6 +67,19 @@ public class PlayerServerAuthority : NetworkBehaviour
       Camera.main.transform.localEulerAngles = new Vector3(90, 180, 0);
       Destroy(GetComponent<NetworkRigidbody>());
     }
+  }
+
+  public override void OnNetworkDespawn()
+  {
+    base.OnNetworkDespawn();
+
+    if (IsServer)
+      NetworkManager.Singleton.OnClientConnectedCallback -= OnNewClientConnected;
+  }
+
+  private void OnNewClientConnected(ulong obj)
+  {
+    Debug.Log("A client has connected");
   }
 
   // Update is called once per frame
@@ -101,7 +114,7 @@ public class PlayerServerAuthority : NetworkBehaviour
   /////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////
 
-  void CheckDeltaPlayer1()
+  private void CheckDeltaPlayer1()
   {
     Vector2 mouseDelta = inputs.MapMain.Look.ReadValue<Vector2>();
     mouseDelta *= 1000f;
@@ -112,11 +125,14 @@ public class PlayerServerAuthority : NetworkBehaviour
       GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
   }
 
-  void CheckDeltaPlayer2()
+  private void CheckDeltaPlayer2()
   {
     Vector2 mouseDelta = inputs.MapMain.Look.ReadValue<Vector2>();
     mouseDelta *= -1000f;
-    SendClientMouseDeltaRpc(mouseDelta);
+
+    GetComponent<Rigidbody>().AddForce(new(mouseDelta.x, 0, mouseDelta.y));
+    if (mouseDelta.magnitude < Mathf.Epsilon)
+      GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
   }
 
   void CheckBoundsPlayer1()
@@ -134,7 +150,7 @@ public class PlayerServerAuthority : NetworkBehaviour
       transform.position = new(transform.position.x, 0, m_limit_center.transform.position.z);
   }
 
-    void CheckBoundsPlayer2()
+  void CheckBoundsPlayer2()
   {
     if (transform.position.x > m_limit_x.transform.position.x)
       transform.position = new(m_limit_x.transform.position.x, 0, transform.position.z);

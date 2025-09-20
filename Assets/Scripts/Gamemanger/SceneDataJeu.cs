@@ -32,13 +32,13 @@ public class SceneDataJeu : MonoBehaviour
 
     private void StartHost()
     {
-        m_mainMenuUI.SetActive(false);
         NetworkManager.Singleton.StartHost();
+        m_mainMenuUI.SetActive(false);
     }
-    
+
     private void StartClient()
     {
-        m_mainMenuUI.SetActive(false);
         NetworkManager.Singleton.StartClient();
+        m_mainMenuUI.SetActive(false);
     }
 }

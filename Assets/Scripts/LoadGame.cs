@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -5,9 +6,10 @@ using UnityEngine.SceneManagement;
 */
 public class LoadGame : MonoBehaviour
 {
+    [field: SerializeField] private SceneAsset m_sceneToLoad;
+
     void Start()
     {
-        SceneManager.LoadScene("JeuMultiBrickJam");
+        SceneManager.LoadScene(m_sceneToLoad.name);
     }
-
 }

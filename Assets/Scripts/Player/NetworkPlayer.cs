@@ -79,23 +79,23 @@ public sealed class NetworkPlayer : NetworkBehaviour
       _player1.GetComponent<NetworkObject>().SpawnWithOwnership(0);
       _player2.GetComponent<NetworkObject>().SpawnWithOwnership(0);
 
-      ulong _player1_NetworkID = _player1.GetComponent<NetworkObject>().NetworkObjectId;
-      ulong _player2_NetworkID = _player2.GetComponent<NetworkObject>().NetworkObjectId;
+      ulong _player1Network = _player1.GetComponent<NetworkObject>().NetworkObjectId;
+      ulong _player2Network = _player2.GetComponent<NetworkObject>().NetworkObjectId;
 
-      GameStart_Rpc(_player1_NetworkID, _player2_NetworkID);
-
+      GameStart_Rpc(_player1Network, _player2Network);
       PowerupManager.Singleton.Initialize();
       PowerupManager.Singleton.Begin();
+      // PuckPhysics.Singleton.InitPlayers(_player1Network, _player2Network);
     }
   }
 
   [Rpc(SendTo.ClientsAndHost)]
   private void GameStart_Rpc(
-    ulong _player1_NetworkID,
-    ulong _player2_NetworkID)
+    ulong _player1,
+    ulong _player2)
   {
-    m_player1 = NetworkManager.Singleton.SpawnManager.SpawnedObjects[_player1_NetworkID].gameObject;
-    m_player2 = NetworkManager.Singleton.SpawnManager.SpawnedObjects[_player2_NetworkID].gameObject;
+    m_player1 = NetworkManager.Singleton.SpawnManager.SpawnedObjects[_player1].gameObject;
+    m_player2 = NetworkManager.Singleton.SpawnManager.SpawnedObjects[_player2].gameObject;
     m_limit_x = SceneDataJeu.Singleton.Limit_x;
     m_limit_z = SceneDataJeu.Singleton.Limit_z;
     m_limit_center = SceneDataJeu.Singleton.Limit_center;

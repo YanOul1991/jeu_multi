@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Puck
+  - Powerup
   layers:
   - Default
   - TransparentFX

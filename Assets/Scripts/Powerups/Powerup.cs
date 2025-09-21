@@ -1,17 +1,17 @@
+using System;
 using UnityEngine;
 
-public class Powerup : MonoBehaviour
+public enum PowerupEffects
 {
-  private Mesh m_mesh;
-  private Bounds m_bounds;
-  [field: SerializeField] public float SizeX { get; private set; }
-  [field: SerializeField] public float SizeZ { get; private set; }
+  grow,
+  shrink,
+  slow,
+  Count
+}
 
-  private void Awake()
-  {
-    m_mesh = GetComponent<MeshFilter>().mesh;
-    m_bounds = m_mesh.bounds;
-    SizeX = m_bounds.size.x;
-    SizeZ = m_bounds.size.z;
-  }
+[Serializable]
+public struct Powerup
+{
+  public GameObject obj;
+  public PowerupEffects effect;
 }

@@ -517,6 +517,8 @@ MonoBehaviour:
   m_powerupCountX: 8
   m_powerupCountZ: 4
   <PrefabPowerUp>k__BackingField: {fileID: 5129394246182396985, guid: 1bd15dea838ca5540ab8d4274608ff19, type: 3}
+  m_poolpow: []
+  m_powerupDefaultMat: {fileID: 2100000, guid: 04f371bfc08a5de4f86411d14d916244, type: 2}
 --- !u!1 &405582448
 GameObject:
   m_ObjectHideFlags: 0
@@ -2241,6 +2243,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5072135399548107330, guid: 23892dc9c039095419cba67d7b9e3e8a, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 04f371bfc08a5de4f86411d14d916244, type: 2}
     - target: {fileID: 6208481026086289709, guid: 23892dc9c039095419cba67d7b9e3e8a, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.01

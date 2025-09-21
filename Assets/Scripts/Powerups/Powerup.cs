@@ -1,16 +1,17 @@
 using UnityEngine;
 
-public class Powerups : MonoBehaviour
+public class Powerup : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+  private Mesh m_mesh;
+  private Bounds m_bounds;
+  [field: SerializeField] public float SizeX { get; private set; }
+  [field: SerializeField] public float SizeZ { get; private set; }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+  private void Awake()
+  {
+    m_mesh = GetComponent<MeshFilter>().mesh;
+    m_bounds = m_mesh.bounds;
+    SizeX = m_bounds.size.x;
+    SizeZ = m_bounds.size.z;
+  }
 }

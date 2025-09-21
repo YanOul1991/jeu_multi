@@ -514,6 +514,9 @@ MonoBehaviour:
   m_boutonStart_client: {fileID: 1483898272}
   <PlayerPrefab>k__BackingField: {fileID: 6945203631114569819, guid: 10a8bb6116837824a9be8bae0e292f60, type: 3}
   <PuckPrefab>k__BackingField: {fileID: 6729262082301107095, guid: 23892dc9c039095419cba67d7b9e3e8a, type: 3}
+  m_powerupCountX: 8
+  m_powerupCountZ: 4
+  <PrefabPowerUp>k__BackingField: {fileID: 5129394246182396985, guid: 1bd15dea838ca5540ab8d4274608ff19, type: 3}
 --- !u!1 &405582448
 GameObject:
   m_ObjectHideFlags: 0
@@ -1379,7 +1382,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
+  m_VertexColorAlwaysGammaSpace: 1
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -1642,7 +1645,7 @@ Transform:
   m_GameObject: {fileID: 1619756995}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -2}
+  m_LocalPosition: {x: 0, y: 0, z: -3}
   m_LocalScale: {x: 0.25, y: 1, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children: []

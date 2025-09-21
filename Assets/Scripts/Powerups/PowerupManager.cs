@@ -3,14 +3,15 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using Unity.Collections;
 
 
 public class PowerupManager : NetworkBehaviour
 {
   public static PowerupManager Singleton;
 
-  private static readonly WaitForSecondsRealtime s_waitTime = new(5.0f);
-  private static readonly WaitForSecondsRealtime s_waitSpawn = new(1.0f);
+  private static readonly WaitForSecondsRealtime s_waitTime = new(10.0f);
+  private static readonly WaitForSecondsRealtime s_waitSpawn = new(2.0f);
 
   [field: SerializeField] private int m_powerupCountX;
   [field: SerializeField] private int m_powerupCountZ;
@@ -19,10 +20,11 @@ public class PowerupManager : NetworkBehaviour
 
   private List<Vector3> m_poolPoints;
   private List<Vector3> m_activePoints;
-  private List<Powerup> m_activePowerups;
-  private List<Powerup> m_poolPowerups;
+  // private List<Powerup> m_activePowerups;
+  private List<ulong> m_poolPowerups;
 
   Dictionary<PowerupEffects, Material> m_dicEffMaterial;
+  Dictionary<ulong, PowerupEffects> m_dicActivePowerups;
 
   private void Awake()
   {
@@ -49,10 +51,11 @@ public class PowerupManager : NetworkBehaviour
   public void Initialize()
   {
     // m_poolPowerUp = new Queue<GameObject>();
-    m_activePowerups = new List<Powerup>();
-    m_poolPowerups = new List<Powerup>();
+    // m_activePowerups = new List<Powerup>();
+    m_poolPowerups = new List<ulong>();
     m_poolPoints = new List<Vector3>();
     m_activePoints = new List<Vector3>();
+    m_dicActivePowerups = new Dictionary<ulong, PowerupEffects>();
     // InitMaterials();
 
     float _pSizeX = PrefabPowerUp.transform.GetChild(0).GetComponent<MeshFilter>().sharedMesh.bounds.size.x;
@@ -85,11 +88,7 @@ public class PowerupManager : NetworkBehaviour
 
       _instance.GetComponent<NetworkObject>().SpawnWithOwnership(0);
       NetworkDeactivatePowerup_Rpc(_instance.GetComponent<NetworkObject>().NetworkObjectId);
-
-      m_poolPowerups.Add(new Powerup
-      {
-        obj = _instance.GetComponent<NetworkObject>().NetworkObjectId
-      });
+      m_poolPowerups.Add(_instance.GetComponent<NetworkObject>().NetworkObjectId);
 
       m_poolPoints.Add(new Vector3(
         _left + _spacingX + (_pSizeX / 2) + ((_pSizeX + _spacingX) * _columnGrid),
@@ -107,25 +106,25 @@ public class PowerupManager : NetworkBehaviour
     
     for (int i = 0; i < 6; i++)
     {
-      // Get NetworkObject ref
-      Powerup _powerup = m_poolPowerups[i];
+      // Get NetworkObject
+      ulong _powerup = m_poolPowerups[i];
+
       int _posIndex = UnityEngine.Random.Range(0, m_poolPoints.Count);
 
       // Get GameObject with associated networkID and set its position
-      GameObject _obj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[_powerup.obj].gameObject;
+      GameObject _obj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[_powerup].gameObject;
 
       m_activePoints.Add(m_poolPoints[_posIndex]);
       _obj.transform.position = m_poolPoints[_posIndex];
       m_poolPoints.RemoveAt(_posIndex);
 
       PowerupEffects _eff = (PowerupEffects)UnityEngine.Random.Range(0, (int)PowerupEffects.Count);
-      _powerup.effect = _eff;
 
-      m_activePowerups.Add(m_poolPowerups[i]);
+      m_dicActivePowerups.Add(m_poolPowerups[i], _eff);
       m_poolPowerups.RemoveAt(i);
-      
+
       // Appeler RPC pour activer le bon powerup
-      NetworkActivatePowerup_Rpc(_powerup.obj, (byte)_eff);
+      NetworkActivatePowerup_Rpc(_powerup, (byte)_eff);
     }
   }
 
@@ -145,10 +144,10 @@ public class PowerupManager : NetworkBehaviour
 
   private void ResetPowerups()
   {
-    foreach (Powerup _powerup in m_activePowerups)
+    foreach (KeyValuePair<ulong, PowerupEffects> pair in m_dicActivePowerups)
     {
-      m_poolPowerups.Add(_powerup);
-      NetworkDeactivatePowerup_Rpc(_powerup.obj);
+      m_poolPowerups.Add(pair.Key);
+      NetworkDeactivatePowerup_Rpc(pair.Key);
     }
 
     foreach (Vector3 _point in m_activePoints)
@@ -156,8 +155,8 @@ public class PowerupManager : NetworkBehaviour
       m_poolPoints.Add(_point);
     }
 
-    m_activePowerups = new List<Powerup>();
-    m_activePoints = new List<Vector3>();
+    m_dicActivePowerups.Clear();
+    m_activePoints.Clear();
   }
 
   private IEnumerator SpawnPeriodic()
@@ -171,6 +170,12 @@ public class PowerupManager : NetworkBehaviour
     }
   }
 
+  public void TiggerPowerupHit(ulong _player, ulong _powerup)
+  {
+    Debug.Log($"The player {_player} has hit the powerup {_powerup}");
+    NetworkDeactivatePowerup_Rpc(_powerup);
+  }
+
   //////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////// Remote Network Procedures
   //////////////////////////////////////////////////////////////////////////////
@@ -180,7 +185,6 @@ public class PowerupManager : NetworkBehaviour
   {
     GameObject _gameObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[_target].gameObject;
     _gameObject.SetActive(false);
-    _gameObject.isStatic = true;
   }
 
   [Rpc(SendTo.Everyone)]

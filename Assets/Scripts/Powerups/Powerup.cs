@@ -1,16 +1,17 @@
+using System;
 using UnityEngine;
 
-public class Powerups : MonoBehaviour
+public enum PowerupEffects
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+  grow,
+  shrink,
+  slow,
+  Count
+}
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+[Serializable]
+public struct Powerup
+{
+  public ulong obj;
+  public PowerupEffects effect;
 }

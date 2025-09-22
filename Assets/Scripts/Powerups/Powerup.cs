@@ -12,6 +12,6 @@ public enum PowerupEffects
 [Serializable]
 public struct Powerup
 {
-  public GameObject obj;
+  public ulong obj;
   public PowerupEffects effect;
 }

@@ -19,21 +19,6 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    // Fonction appelée pour le bouton qui permet de se connecter comme hôte
-    public void LanceCommeHote()
-    {
-        NetworkManager.Singleton.StartHost();
-    }
-
-    // Fonction appelée pour le bouton qui permet de se connecter comme client
-    public void LanceCommeClient()
-    {
-        NetworkManager.Singleton.StartClient();
-    }
-
-    // L'hôte de la partie attend que 2 joueurs soient connectés pour lancer la partie
-    // Seulement l'hôte exécute ce code
-    // Aucune vérification si partie déjà en cours
     void Update()
     {
         if (!IsHost) return;
@@ -45,12 +30,10 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    // Activation d'une nouvelle partie lorsque 2 joueurs. On appelle la fonction de la balle qui
-    // la place au milieu et qui lui donne une vélocité.
     public void NouvellePartie()
     {
         partieEnCours = true;
-        Puck.instance.LancePuckMilieu();
+        Puck.instance.PlacementPuck(new Vector3(0, 0, 0));
     }
 
    // Fonction appelée par le ScoreManager pour terminer la partie

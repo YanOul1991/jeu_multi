@@ -13,6 +13,9 @@ public class Puck : NetworkBehaviour
     public GameObject Goal1;
     public GameObject Goal2;
 
+    public GameObject puckRespawnPlayer1;
+    public GameObject puckRespawnPlayer2;
+
 
     void Awake()
     {
@@ -37,23 +40,26 @@ public class Puck : NetworkBehaviour
         if (collision.gameObject == Goal1)
         {
             ScoreManager.instance.AugmenteHoteScore();
-            LancePuckMilieu();
+            PlacementPuckGoal(puckRespawnPlayer2.transform.position);
         }
         else if (collision.gameObject == Goal2)
         {
             ScoreManager.instance.AugmenteScoreClient();
-            LancePuckMilieu();
+            PlacementPuckGoal(puckRespawnPlayer1.transform.position);
         }
     }
 
-    public void LancePuckMilieu()
+    public void PlacementPuckGoal(Vector3 puckRespawnPosition)
+    {
+        PlacementPuck(puckRespawnPosition);
+        if (GameManager.instance.partieTerminee) return; 
+        StartCoroutine(NouvellePuck());
+    }
+    public void PlacementPuck(Vector3 puckRespawnPosition)
     {
         GetComponent<NetworkTransform>().Interpolate = false;
-        transform.position = new Vector3(0f, 0f, 0f);
-        GetComponent<Rigidbody>().linearVelocity = new Vector3(0, 0, 0);
-        //if (GameManager.instance.partieTerminee) return; // Il faudra créer cette variable dans le GameManager
-        StartCoroutine(NouvellePuck());
-
+        transform.position = puckRespawnPosition;
+        GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
     }
 
     IEnumerator NouvellePuck()

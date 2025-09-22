@@ -83,6 +83,9 @@ public sealed class NetworkPlayer : NetworkBehaviour
       ulong _player2_NetworkID = _player2.GetComponent<NetworkObject>().NetworkObjectId;
 
       GameStart_Rpc(_player1_NetworkID, _player2_NetworkID);
+
+      PowerupManager.Singleton.Initialize();
+      PowerupManager.Singleton.SpawnPowerups();
     }
   }
 

@@ -487,7 +487,7 @@ Transform:
   m_GameObject: {fileID: 404407584}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.21013, y: -0.22524, z: -3.92573}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -514,11 +514,6 @@ MonoBehaviour:
   m_boutonStart_client: {fileID: 1483898272}
   <PlayerPrefab>k__BackingField: {fileID: 6945203631114569819, guid: 10a8bb6116837824a9be8bae0e292f60, type: 3}
   <PuckPrefab>k__BackingField: {fileID: 6729262082301107095, guid: 23892dc9c039095419cba67d7b9e3e8a, type: 3}
-  m_powerupCountX: 8
-  m_powerupCountZ: 4
-  <PrefabPowerUp>k__BackingField: {fileID: 5129394246182396985, guid: 1bd15dea838ca5540ab8d4274608ff19, type: 3}
-  m_poolpow: []
-  m_powerupDefaultMat: {fileID: 2100000, guid: 04f371bfc08a5de4f86411d14d916244, type: 2}
 --- !u!1 &405582448
 GameObject:
   m_ObjectHideFlags: 0
@@ -892,6 +887,82 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &882846873
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 882846874}
+  - component: {fileID: 882846875}
+  - component: {fileID: 882846876}
+  m_Layer: 0
+  m_Name: PowerUpManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 2147483647
+  m_IsActive: 1
+--- !u!4 &882846874
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 882846873}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &882846875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 882846873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 1604847020
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &882846876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 882846873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bcf957a11392c144b0c945a900376f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PowerupManager
+  ShowTopMostFoldoutHeaderGroup: 1
+  m_powerupCountX: 8
+  m_powerupCountZ: 4
+  <PrefabPowerUp>k__BackingField: {fileID: 6452330417978565299, guid: e6107d3a9d819734eaaba145ba0fffba, type: 3}
+  m_poolpow: []
+  m_powerupDefaultMat: {fileID: 2100000, guid: 04f371bfc08a5de4f86411d14d916244, type: 2}
 --- !u!1 &974404313
 GameObject:
   m_ObjectHideFlags: 0
@@ -2257,7 +2328,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6208481026086289709, guid: 23892dc9c039095419cba67d7b9e3e8a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.95
+      value: -4.58
       objectReference: {fileID: 0}
     - target: {fileID: 6208481026086289709, guid: 23892dc9c039095419cba67d7b9e3e8a, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2309,6 +2380,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 404407585}
+  - {fileID: 882846874}
   - {fileID: 974404316}
   - {fileID: 2032778700}
   - {fileID: 1041161633}

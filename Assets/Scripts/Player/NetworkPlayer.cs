@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Netcode.Components;
@@ -17,10 +18,12 @@ public sealed class NetworkPlayer : NetworkBehaviour
   private Vector2 m_hostMouseDelta;
   private Vector2 m_clientMouseDelta;
   private bool m_isReady = false;
-  private const float c_delatMultiplier = 20000.0f;
+  private const float c_deltaMultipler = 20000.0f;
+  private float m_player1SpeedEffect;
+  private float m_player2SpeedEffect;
 
   ///////////////////////////////////////////////////////////////////// FUNCTIONS
-  
+
   private void Awake()
   {
     if (Singleton == null)
@@ -85,7 +88,6 @@ public sealed class NetworkPlayer : NetworkBehaviour
       GameStart_Rpc(_player1Network, _player2Network);
       PowerupManager.Singleton.Initialize();
       PowerupManager.Singleton.Begin();
-      // PuckPhysics.Singleton.InitPlayers(_player1Network, _player2Network);
     }
   }
 
@@ -99,6 +101,8 @@ public sealed class NetworkPlayer : NetworkBehaviour
     m_limit_x = SceneDataJeu.Singleton.Limit_x;
     m_limit_z = SceneDataJeu.Singleton.Limit_z;
     m_limit_center = SceneDataJeu.Singleton.Limit_center;
+    m_player1SpeedEffect = 1;
+    m_player2SpeedEffect = 1;
 
     if (IsServer)
     {
@@ -110,10 +114,10 @@ public sealed class NetworkPlayer : NetworkBehaviour
     {
       Camera.main.transform.localEulerAngles = new Vector3(90, 180, 0);
       m_updateActions.Add(ClientUpdateDelta);
-      
+
       Destroy(m_player1.GetComponent<NetworkRigidbody>());
       Destroy(m_player2.GetComponent<NetworkRigidbody>());
-      
+
       m_player1.GetComponent<Rigidbody>().isKinematic = true;
       m_player2.GetComponent<Rigidbody>().isKinematic = true;
     }
@@ -127,23 +131,32 @@ public sealed class NetworkPlayer : NetworkBehaviour
   [Rpc(SendTo.Server)]
   private void SendClientMove_Rpc(Vector2 _clientDelta)
   {
-    m_clientMouseDelta = -_clientDelta;
+    m_clientMouseDelta = -_clientDelta * m_player2SpeedEffect;
   }
 
   private void ClientUpdateDelta()
   {
-    SendClientMove_Rpc(m_inputs.MapMain.Look.ReadValue<Vector2>() * c_delatMultiplier);
+    SendClientMove_Rpc(m_inputs.MapMain.Look.ReadValue<Vector2>() * c_deltaMultipler) ;
   }
 
   private void HostUpdateDelta()
   {
-    m_hostMouseDelta = m_inputs.MapMain.Look.ReadValue<Vector2>() * c_delatMultiplier;
+    m_hostMouseDelta = m_player1SpeedEffect * c_deltaMultipler * m_inputs.MapMain.Look.ReadValue<Vector2>()  ;
   }
 
   public void ServerPhysicsUpdate()
   {
-    m_player1.GetComponent<Rigidbody>().AddForce(new(m_hostMouseDelta.x, 0, m_hostMouseDelta.y));
-    m_player2.GetComponent<Rigidbody>().AddForce(new(m_clientMouseDelta.x, 0, m_clientMouseDelta.y));
+    m_player1.GetComponent<Rigidbody>().AddForce(new Vector3(
+      m_hostMouseDelta.x, 
+      0, 
+      m_hostMouseDelta.y
+    ));
+
+    m_player2.GetComponent<Rigidbody>().AddForce(new Vector3(
+      m_clientMouseDelta.x, 
+      0, 
+      m_clientMouseDelta.y
+    ));
   }
 
   private void ServerCheckNoMouseMove()

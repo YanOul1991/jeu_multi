@@ -170,10 +170,56 @@ public class PowerupManager : NetworkBehaviour
     }
   }
 
-  public void TiggerPowerupHit(ulong _player, ulong _powerup)
+  [Rpc(SendTo.Server)]
+  public void NetworkPowerupHit_Rpc(ulong _player, ulong _powerupObj)
   {
-    Debug.Log($"The player {_player} has hit the powerup {_powerup}");
-    NetworkDeactivatePowerup_Rpc(_powerup);
+    Debug.Log("Applying effect to player");
+
+    if (!IsServer) return;
+    NetworkObject _networkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[_player];
+    PowerupEffects _effect = m_dicActivePowerups[_powerupObj];
+
+    NetworkDeactivatePowerup_Rpc(_powerupObj);
+
+    switch (_effect)
+    {
+    case PowerupEffects.grow :
+      _networkObject.gameObject.transform.localScale *= 2;
+        break;
+    case PowerupEffects.shrink :
+      _networkObject.gameObject.transform.localScale /= 2;
+        break;
+    case PowerupEffects.slow :
+      _networkObject.gameObject.transform.localScale *= 2;
+      break;
+    default:
+        break;
+    }
+
+    StartCoroutine(ResetEffect(_player, m_dicActivePowerups[_powerupObj]));
+  }
+
+  private IEnumerator ResetEffect(ulong _target, PowerupEffects _effect)
+  {
+    Debug.Log("Starting countdown to reset");
+    yield return new WaitForSeconds(8.0f);
+
+    NetworkObject _networkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[_target];
+    
+    switch (_effect)
+    {
+      case PowerupEffects.grow:
+        _networkObject.gameObject.transform.localScale /= 2;
+        break;
+      case PowerupEffects.shrink:
+        _networkObject.gameObject.transform.localScale *= 2;
+        break;
+      case PowerupEffects.slow:
+        _networkObject.gameObject.transform.localScale *= 2;
+        break;
+      default:
+        break;
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////////

@@ -5,7 +5,7 @@ public class PuckPhysics : NetworkBehaviour
 {
   public static PuckPhysics Singleton;
   private ulong m_lastPlayerHit;
-
+  
   private void Awake()
   {
     if (Singleton == null)
@@ -25,7 +25,7 @@ public class PuckPhysics : NetworkBehaviour
 
     if (collision.gameObject.CompareTag("Powerup"))
     {
-      PowerupManager.Singleton.TiggerPowerupHit(
+      PowerupManager.Singleton.NetworkPowerupHit_Rpc(
         m_lastPlayerHit,
         collision.transform.parent.GetComponent<NetworkObject>().NetworkObjectId
       );

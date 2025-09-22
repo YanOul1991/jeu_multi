@@ -9,8 +9,8 @@ public class ScoreManager : NetworkBehaviour
     [SerializeField] private int pointageCible;
     private NetworkVariable<int> scoreHote = new NetworkVariable<int>();
     private NetworkVariable<int> scoreClient = new NetworkVariable<int>();
-    //public GameObject pannelVictoire; 
-    //public GameObject pannelDefaite; 
+    public GameObject pannelVictoire; 
+    public GameObject pannelDefaite; 
     private void Awake()
     {
         if (instance == null)
@@ -107,11 +107,11 @@ public class ScoreManager : NetworkBehaviour
 
         if (IsServer)
         {
-            //pannelVictoire.SetActive(true);
+            pannelVictoire.SetActive(true);
         }
         else
         {
-            //pannelDefaite.SetActive(true);
+            pannelDefaite.SetActive(true);
         }
     }
     /* Fonction RPC pour afficher le panel de victoire pour le client et le panel de défaite pour l'hôte
@@ -122,11 +122,11 @@ public class ScoreManager : NetworkBehaviour
 
         if (IsServer)
         {
-            //pannelDefaite.SetActive(true);
+            pannelDefaite.SetActive(true);
         }
         else
         {
-            //pannelVictoire.SetActive(true);
+            pannelVictoire.SetActive(true);
         }
     }
 }

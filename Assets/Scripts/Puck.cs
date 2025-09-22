@@ -30,16 +30,10 @@ public class Puck : NetworkBehaviour
         //if (!GameManager.instance.partieEnCours) return;
     }
 
-    void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.tag == "Player")
-        {
-            Debug.Log("Puck Hit a Player");
-        }
-    }
-
     void OnTriggerEnter(Collider collision)
     {
+        if (!IsServer) return; 
+
         if (collision.gameObject == Goal1)
         {
             ScoreManager.instance.AugmenteHoteScore();

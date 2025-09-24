@@ -12,6 +12,7 @@ public class PowerupManager : NetworkBehaviour
 
   private static readonly WaitForSecondsRealtime s_waitTime = new(10.0f);
   private static readonly WaitForSecondsRealtime s_waitSpawn = new(2.0f);
+  private static readonly WaitForSecondsRealtime s_waitEffect = new(3.5f);
 
   [field: SerializeField] private int m_powerupCountX;
   [field: SerializeField] private int m_powerupCountZ;
@@ -24,7 +25,8 @@ public class PowerupManager : NetworkBehaviour
   private List<ulong> m_poolPowerups;
 
   Dictionary<PowerupEffects, Material> m_dicEffMaterial;
-  Dictionary<ulong, PowerupEffects> m_dicActivePowerups;
+  Dictionary<ulong, PowerupEffects> m_dictSpawnedPowerups;
+  private Dictionary<ulong, int> m_dictActiveEffects;
 
   private void Awake()
   {
@@ -37,8 +39,6 @@ public class PowerupManager : NetworkBehaviour
       Destroy(gameObject);
       return;
     }
-
-    InitMaterials();
   }
 
   public void Begin()
@@ -48,15 +48,21 @@ public class PowerupManager : NetworkBehaviour
     StartCoroutine(SpawnPeriodic());
   }
 
-  public void Initialize()
+  public void Initialize(ulong _player1, ulong _player2)
   {
-    // m_poolPowerUp = new Queue<GameObject>();
-    // m_activePowerups = new List<Powerup>();
+    // Initialization des listes
+
     m_poolPowerups = new List<ulong>();
     m_poolPoints = new List<Vector3>();
     m_activePoints = new List<Vector3>();
-    m_dicActivePowerups = new Dictionary<ulong, PowerupEffects>();
-    // InitMaterials();
+    m_dictSpawnedPowerups = new Dictionary<ulong, PowerupEffects>();
+    m_dictActiveEffects = new Dictionary<ulong, int>();
+    InitMaterials_Rpc();
+
+    m_dictActiveEffects.Add(_player1, 0);
+    m_dictActiveEffects.Add(_player2, 0);
+
+    // Initialization de la grid des Powerups
 
     float _pSizeX = PrefabPowerUp.transform.GetChild(0).GetComponent<MeshFilter>().sharedMesh.bounds.size.x;
     float _pSizeZ = PrefabPowerUp.transform.GetChild(0).GetComponent<MeshFilter>().sharedMesh.bounds.size.z;
@@ -108,7 +114,6 @@ public class PowerupManager : NetworkBehaviour
     {
       // Get NetworkObject
       ulong _powerup = m_poolPowerups[i];
-
       int _posIndex = UnityEngine.Random.Range(0, m_poolPoints.Count);
 
       // Get GameObject with associated networkID and set its position
@@ -120,7 +125,7 @@ public class PowerupManager : NetworkBehaviour
 
       PowerupEffects _eff = (PowerupEffects)UnityEngine.Random.Range(0, (int)PowerupEffects.Count);
 
-      m_dicActivePowerups.Add(m_poolPowerups[i], _eff);
+      m_dictSpawnedPowerups.Add(m_poolPowerups[i], _eff);
       m_poolPowerups.RemoveAt(i);
 
       // Appeler RPC pour activer le bon powerup
@@ -131,7 +136,8 @@ public class PowerupManager : NetworkBehaviour
   /// <summary>
   /// Initialization des materiaux pour les powerups
   /// </summary>
-  void InitMaterials()
+  [Rpc(SendTo.Everyone)]
+  void InitMaterials_Rpc()
   {
     m_dicEffMaterial = new Dictionary<PowerupEffects, Material>();
     for (int i = 0; i < (int)PowerupEffects.Count; i++)
@@ -144,7 +150,7 @@ public class PowerupManager : NetworkBehaviour
 
   private void ResetPowerups()
   {
-    foreach (KeyValuePair<ulong, PowerupEffects> pair in m_dicActivePowerups)
+    foreach (KeyValuePair<ulong, PowerupEffects> pair in m_dictSpawnedPowerups)
     {
       m_poolPowerups.Add(pair.Key);
       NetworkDeactivatePowerup_Rpc(pair.Key);
@@ -155,7 +161,7 @@ public class PowerupManager : NetworkBehaviour
       m_poolPoints.Add(_point);
     }
 
-    m_dicActivePowerups.Clear();
+    m_dictSpawnedPowerups.Clear();
     m_activePoints.Clear();
   }
 
@@ -173,53 +179,42 @@ public class PowerupManager : NetworkBehaviour
   [Rpc(SendTo.Server)]
   public void NetworkPowerupHit_Rpc(ulong _player, ulong _powerupObj)
   {
-    Debug.Log("Applying effect to player");
-
     if (!IsServer) return;
-    NetworkObject _networkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[_player];
-    PowerupEffects _effect = m_dicActivePowerups[_powerupObj];
+    PowerupEffects _effect = m_dictSpawnedPowerups[_powerupObj];
 
     NetworkDeactivatePowerup_Rpc(_powerupObj);
-
-    switch (_effect)
+    
+    if ((m_dictActiveEffects[_player] & 1 << ((int)_effect)) == 0)
     {
-    case PowerupEffects.grow :
-      _networkObject.gameObject.transform.localScale *= 2;
-        break;
-    case PowerupEffects.shrink :
-      _networkObject.gameObject.transform.localScale /= 2;
-        break;
-    case PowerupEffects.slow :
-      _networkObject.gameObject.transform.localScale *= 2;
-      break;
-    default:
-        break;
+      Debug.Log("Applying effect to player");
+      m_dictActiveEffects[_player] |= 1 << ((int)_effect);
+      StartCoroutine(ResetEffect(_player, m_dictSpawnedPowerups[_powerupObj]));
     }
-
-    StartCoroutine(ResetEffect(_player, m_dicActivePowerups[_powerupObj]));
   }
-
+  
   private IEnumerator ResetEffect(ulong _target, PowerupEffects _effect)
   {
-    Debug.Log("Starting countdown to reset");
-    yield return new WaitForSeconds(8.0f);
-
     NetworkObject _networkObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[_target];
-    
+
     switch (_effect)
     {
       case PowerupEffects.grow:
-        _networkObject.gameObject.transform.localScale /= 2;
+        _networkObject.gameObject.transform.localScale *= 2.5f;
+        yield return s_waitEffect;
+        _networkObject.gameObject.transform.localScale /= 2.5f;
         break;
+
       case PowerupEffects.shrink:
-        _networkObject.gameObject.transform.localScale *= 2;
+        _networkObject.gameObject.transform.localScale /= 1.5f;
+        yield return s_waitEffect;
+        _networkObject.gameObject.transform.localScale *= 1.5f;
         break;
-      case PowerupEffects.slow:
-        _networkObject.gameObject.transform.localScale *= 2;
-        break;
+
       default:
         break;
     }
+
+    m_dictActiveEffects[_target] &= ~(1 << ((int)_effect));
   }
 
   //////////////////////////////////////////////////////////////////////////////

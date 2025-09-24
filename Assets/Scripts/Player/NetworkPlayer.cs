@@ -13,14 +13,15 @@ public sealed class NetworkPlayer : NetworkBehaviour
   [field: SerializeField] private Transform  m_limit_x;
   [field: SerializeField] private Transform  m_limit_z;
   [field: SerializeField] private Transform  m_limit_center;
+
   private UserInputs m_inputs;
   private List<Action> m_updateActions;
   private Vector2 m_hostMouseDelta;
   private Vector2 m_clientMouseDelta;
   private bool m_isReady = false;
-  private const float c_deltaMultipler = 20000.0f;
-  private float m_player1SpeedEffect;
-  private float m_player2SpeedEffect;
+
+  private const float c_deltaDefault = 20000.0f;
+  private float m_deltaMultiplier;
 
   ///////////////////////////////////////////////////////////////////// FUNCTIONS
 
@@ -86,7 +87,7 @@ public sealed class NetworkPlayer : NetworkBehaviour
       ulong _player2Network = _player2.GetComponent<NetworkObject>().NetworkObjectId;
 
       GameStart_Rpc(_player1Network, _player2Network);
-      PowerupManager.Singleton.Initialize();
+      PowerupManager.Singleton.Initialize(_player1Network, _player2Network);
       PowerupManager.Singleton.Begin();
     }
   }
@@ -101,8 +102,7 @@ public sealed class NetworkPlayer : NetworkBehaviour
     m_limit_x = SceneDataJeu.Singleton.Limit_x;
     m_limit_z = SceneDataJeu.Singleton.Limit_z;
     m_limit_center = SceneDataJeu.Singleton.Limit_center;
-    m_player1SpeedEffect = 1;
-    m_player2SpeedEffect = 1;
+    m_deltaMultiplier = 1.0f;
 
     if (IsServer)
     {
@@ -131,17 +131,17 @@ public sealed class NetworkPlayer : NetworkBehaviour
   [Rpc(SendTo.Server)]
   private void SendClientMove_Rpc(Vector2 _clientDelta)
   {
-    m_clientMouseDelta = -_clientDelta * m_player2SpeedEffect;
+    m_clientMouseDelta = -_clientDelta * m_deltaMultiplier;
   }
 
   private void ClientUpdateDelta()
   {
-    SendClientMove_Rpc(m_inputs.MapMain.Look.ReadValue<Vector2>() * c_deltaMultipler) ;
+    SendClientMove_Rpc(m_inputs.MapMain.Look.ReadValue<Vector2>() * c_deltaDefault) ;
   }
-
+  
   private void HostUpdateDelta()
   {
-    m_hostMouseDelta = m_player1SpeedEffect * c_deltaMultipler * m_inputs.MapMain.Look.ReadValue<Vector2>()  ;
+    m_hostMouseDelta = m_deltaMultiplier * c_deltaDefault * m_inputs.MapMain.Look.ReadValue<Vector2>();
   }
 
   public void ServerPhysicsUpdate()
@@ -158,7 +158,7 @@ public sealed class NetworkPlayer : NetworkBehaviour
       m_clientMouseDelta.y
     ));
   }
-
+  
   private void ServerCheckNoMouseMove()
   {
     if (m_hostMouseDelta.magnitude < Mathf.Epsilon)

@@ -5,7 +5,7 @@ public class PuckPhysics : NetworkBehaviour
 {
   public static PuckPhysics Singleton;
   private ulong m_lastPlayerHit;
-  
+
   private void Awake()
   {
     if (Singleton == null)

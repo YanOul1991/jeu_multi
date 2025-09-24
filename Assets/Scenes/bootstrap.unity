@@ -283,7 +283,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7553013301507526254, guid: a31bdfd65e22e8b45944d261da430be3, type: 3}
       propertyPath: NetworkConfig.TickRate
-      value: 60
+      value: 120
       objectReference: {fileID: 0}
     - target: {fileID: 7553013301507526254, guid: a31bdfd65e22e8b45944d261da430be3, type: 3}
       propertyPath: NetworkConfig.PlayerPrefab

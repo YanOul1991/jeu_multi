@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -22,6 +23,7 @@ public sealed class NetworkPlayer : NetworkBehaviour
 
   private const float c_deltaDefault = 20000.0f;
   private float m_deltaMultiplier;
+  public event Action OnPlayerDisconnected;
 
   ///////////////////////////////////////////////////////////////////// FUNCTIONS
 
@@ -39,17 +41,29 @@ public sealed class NetworkPlayer : NetworkBehaviour
     m_hostMouseDelta = new Vector2();
     m_clientMouseDelta = new Vector2();
 
-    Application.targetFrameRate = -1;
+    Application.targetFrameRate = 120;
+
+
   }
 
   public override void OnNetworkSpawn()
   {
     base.OnNetworkSpawn();
-
+#if DEBUG
+    Debug.Log("Connected to game");
+#endif
     if (IsServer)
     {
       NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
     }
+  }
+
+  public override void OnNetworkDespawn()
+  {
+    base.OnNetworkDespawn();
+#if DEBUG
+    Debug.Log("Disconnected from game");
+#endif
   }
 
   // Update is called once per frame
@@ -70,10 +84,14 @@ public sealed class NetworkPlayer : NetworkBehaviour
 
   private void OnClientConnected(ulong obj)
   {
+    if (!IsServer) return;
+
     int _clientCount = NetworkManager.Singleton.ConnectedClients.Count;
+
 
     if (_clientCount >= 2)
     {
+      NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
       GameObject _player1 = Instantiate(SceneDataJeu.Singleton.PlayerPrefab);
       GameObject _player2 = Instantiate(SceneDataJeu.Singleton.PlayerPrefab);
 
@@ -109,6 +127,9 @@ public sealed class NetworkPlayer : NetworkBehaviour
       m_updateActions.Add(HostUpdateDelta);
       m_updateActions.Add(ServerCheckNoMouseMove);
       m_updateActions.Add(ServerCheckPlayerBounds);
+#if DEBUG
+      Debug.Log($"Currently connected player count: {NetworkManager.Singleton.ConnectedClients.Count}");
+#endif  
     }
     else
     {
@@ -121,11 +142,32 @@ public sealed class NetworkPlayer : NetworkBehaviour
       m_player1.GetComponent<Rigidbody>().isKinematic = true;
       m_player2.GetComponent<Rigidbody>().isKinematic = true;
     }
-    
     m_inputs.Enable();
     Cursor.lockState = CursorLockMode.Confined;
     Cursor.visible = false;
     m_isReady = true;
+#if DEBUG
+    Invoke(nameof(Disconnect_Rpc), 10f);
+#endif
+  }
+
+  [Rpc(SendTo.Everyone)]
+  private void Disconnect_Rpc()
+  {
+    if (IsServer)
+    {
+      NetworkManager.Singleton.SpawnManager.SpawnedObjects[m_player1.GetComponent<NetworkObject>().NetworkObjectId].Despawn(true);
+      NetworkManager.Singleton.SpawnManager.SpawnedObjects[m_player2.GetComponent<NetworkObject>().NetworkObjectId].Despawn(true);
+    }
+
+    PowerupManager.Singleton.Test_GameEnd();
+    NetworkManager.Singleton.Shutdown();
+    m_inputs = new UserInputs();
+    m_updateActions = new List<Action>();
+    m_hostMouseDelta = new Vector2();
+    m_clientMouseDelta = new Vector2();
+    m_isReady = false;
+    OnPlayerDisconnected?.Invoke();
   }
 
   [Rpc(SendTo.Server)]

@@ -13,7 +13,7 @@ public class PuckPhysics : NetworkBehaviour
     else
       Destroy(gameObject);
   }
-
+  
   void OnCollisionEnter(Collision collision)
   {
     if (!IsServer) return;

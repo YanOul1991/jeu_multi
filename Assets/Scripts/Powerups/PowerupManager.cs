@@ -6,10 +6,9 @@ using System.Collections;
 using Unity.Collections;
 
 
-public class PowerupManager : NetworkBehaviour
+public sealed class PowerupManager : NetworkBehaviour
 {
   public static PowerupManager Singleton;
-
   private static readonly WaitForSecondsRealtime s_waitTime = new(10.0f);
   private static readonly WaitForSecondsRealtime s_waitSpawn = new(2.0f);
   private static readonly WaitForSecondsRealtime s_waitEffect = new(3.5f);
@@ -21,12 +20,12 @@ public class PowerupManager : NetworkBehaviour
 
   private List<Vector3> m_poolPoints;
   private List<Vector3> m_activePoints;
-  // private List<Powerup> m_activePowerups;
   private List<ulong> m_poolPowerups;
-
   Dictionary<PowerupEffects, Material> m_dicEffMaterial;
   Dictionary<ulong, PowerupEffects> m_dictSpawnedPowerups;
   private Dictionary<ulong, int> m_dictActiveEffects;
+
+  private Coroutine RoutineSpawnPeriodic;
 
   private void Awake()
   {
@@ -45,8 +44,19 @@ public class PowerupManager : NetworkBehaviour
   {
     if (!IsServer) return;
     SpawnPowerups();
-    StartCoroutine(SpawnPeriodic());
+    RoutineSpawnPeriodic = StartCoroutine(SpawnPeriodic());
   }
+#if DEBUG 
+  public void Test_GameEnd()
+  {
+    if (!IsServer) return;
+    if (RoutineSpawnPeriodic != null)
+      StopCoroutine(RoutineSpawnPeriodic);
+    ResetPowerups();
+    foreach (ulong powerup in m_poolPowerups)
+      NetworkManager.Singleton.SpawnManager.SpawnedObjects[powerup].Despawn(true);
+  }
+#endif
 
   public void Initialize(ulong _player1, ulong _player2)
   {
@@ -150,6 +160,8 @@ public class PowerupManager : NetworkBehaviour
 
   private void ResetPowerups()
   {
+    if (!IsServer) return;
+
     foreach (KeyValuePair<ulong, PowerupEffects> pair in m_dictSpawnedPowerups)
     {
       m_poolPowerups.Add(pair.Key);
@@ -186,7 +198,9 @@ public class PowerupManager : NetworkBehaviour
     
     if ((m_dictActiveEffects[_player] & 1 << ((int)_effect)) == 0)
     {
+#if DEBUG
       Debug.Log("Applying effect to player");
+#endif
       m_dictActiveEffects[_player] |= 1 << ((int)_effect);
       StartCoroutine(ResetEffect(_player, m_dictSpawnedPowerups[_powerupObj]));
     }

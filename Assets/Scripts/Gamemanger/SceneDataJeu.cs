@@ -26,20 +26,33 @@ public class SceneDataJeu : MonoBehaviour
   {
     if (Singleton == null) Singleton = this;
     else Destroy(gameObject);
-
-    m_boutonStart_host.onClick.AddListener(StartHost);
-    m_boutonStart_client.onClick.AddListener(StartClient);
+    DisplayOptions();
   }
 
   private void StartHost()
   {
     NetworkManager.Singleton.StartHost();
-    m_mainMenuUI.SetActive(false);
+    HideOptions();
+    
   }
 
   private void StartClient()
   {
     NetworkManager.Singleton.StartClient();
+    HideOptions();
+  }
+
+  private void DisplayOptions()
+  {
+    NetworkPlayer.Singleton.OnPlayerDisconnected -= DisplayOptions;
+    m_boutonStart_host.onClick.AddListener(StartHost);
+    m_boutonStart_client.onClick.AddListener(StartClient);
+  }
+
+  private void HideOptions()
+  {
+    m_boutonStart_host.onClick.RemoveListener(StartHost);
+    m_boutonStart_client.onClick.RemoveListener(StartClient);
     m_mainMenuUI.SetActive(false);
   }
 }

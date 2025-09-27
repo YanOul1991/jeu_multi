@@ -163,7 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df1b484bb5bf5664aa7cbd3b2beb2b10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LoadGame
-  m_sceneToLoad: {fileID: 102900000, guid: ce2ab7d81fbc88c4dbf6ee6d852a1ef5, type: 3}
+  m_sceneToLoad: {fileID: 102900000, guid: 7e2a400203d52004d966e14d17246540, type: 3}
 --- !u!1001 &1780857010
 PrefabInstance:
   m_ObjectHideFlags: 0
